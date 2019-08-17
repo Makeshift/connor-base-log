@@ -22,10 +22,10 @@ log.error("We're going to spam Sentry with this error");
 //Protip: You can set the environment variable LOGGING_LEVEL to change what shows up in your console.
 ```
 
-#### Lazy Boilerplate
+#### Lazy Template
 ```javascript
 const config = require('connor-base-config')();
-config.load({sentry: {dsn: "https://sentry.makeshift.ninja/"}});
+config.load({sentry: {enabled: true, dsn: "https://sentry.makeshift.ninja/"}});
 const log = require('./index.js')(config);
 ```
 

@@ -1,4 +1,5 @@
 const defaultConfig = require('connor-base-config')();
+
 module.exports = (config = defaultConfig) => {
     const {createLogger, format, transports} = require('winston');
     const {combine, json, timestamp, printf, splat, colorize} = format;
@@ -16,7 +17,9 @@ module.exports = (config = defaultConfig) => {
             httpProxy: config.get("proxy.enabled") ? config.get("proxy.address") : null,
             release: `${config.get("metadata.package")}-${config.get("metadata.version")}`,
             debug: config.get("sentry.debug"),
-            environment: config.get("environment.level")
+            environment: config.get("environment.level"),
+            attachStacktrace: true, //This sometimes doesn't capture stacktraces, so we have another process that captures them for every message
+            captureUnhandledRejections: false //We do it ourselves while adding a ton more data
         });
     }
 
@@ -29,9 +32,10 @@ module.exports = (config = defaultConfig) => {
     }
 
     //Since node doesn't auto-exit on unhandled rejections, and Sentry swallows them if you don't handle them,
-    // we make sure to actually log the error, wait for the report to hit Sentry, then exit.
+    // we make sure to actually log the error, wait for the report to hit Sentry, then exit. Node will start exiting on unhandled
+    // rejections soon anyway, so we may as well start doing it now
     process.on('unhandledRejection', (err) => {
-        console.error(err);
+        exportLogger.error("Unhandled promise rejection", {trace: err});
         const client = Sentry.getCurrentHub().getClient();
         if (client) {
             console.log("Flushing Sentry...");
@@ -86,8 +90,8 @@ module.exports = (config = defaultConfig) => {
                     scope.setExtra('stacktrace', parsedException);
                     this.sentry.captureEvent({
                         message: JSON.parse(info[MESSAGE]).message,
-                        transaction: `parsedException[0].fileName`
-                        })
+                        transaction: `${parsedException[0].fileName} in ${parsedException[0].functionName} (${parsedException[0].lineNumber}:${parsedException[0].columnNumber})`
+                    })
                 } else {
                     scope.setExtra('stacktrace', parsedException);
                     this.sentry.captureException(exception);
@@ -139,12 +143,12 @@ module.exports = (config = defaultConfig) => {
                 }))
         }
         ts.push(new transports.Console({
-                timestamp: true,
-                showLevel: true,
+            timestamp: true,
+            showLevel: true,
             format: formatForTTY(),
             level: config.get("logging.level"),
-                stderrLevels: ["error"],
-                consoleWarnLevels: ["warn"]
+            stderrLevels: ["error"],
+            consoleWarnLevels: ["warn"]
         }));
         return createLogger({
             transports: ts
@@ -160,16 +164,19 @@ module.exports = (config = defaultConfig) => {
             this.name = this.constructor.name
         }
     }
-    //Add trace to each invocation
+
+    //Add trace to warn/error invocations
     Object.keys(exportLogger.constructor.prototype).forEach(func => {
-        let original = exportLogger.constructor.prototype[func];
-        if (typeof original === "function") {
-            exportLogger.constructor.prototype[func] = (name, data) => {
-                if (!data) data = {};
-                if (!data.trace) {
-                    data.trace = new Traces()
+        if (["warn", "error"].includes(func)) {
+            let original = exportLogger.constructor.prototype[func];
+            if (typeof original === "function") {
+                exportLogger.constructor.prototype[func] = (name, data) => {
+                    if (!data) data = {};
+                    if (!data.trace) {
+                        data.trace = new Traces()
+                    }
+                    original(name, data);
                 }
-                original(name, data);
             }
         }
     });
