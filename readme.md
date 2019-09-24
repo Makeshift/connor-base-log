@@ -10,8 +10,8 @@ I tend to use this boilerplate package for logging. It automatically sets up Sen
 ```javascript
 //Assuming you have a config.js boilerplate from my logging lib
 //index.js
-const config = require('./config');
-const log = require('connor-base-log')(config); //You don't *need* to pass a config option, but this will let you override defaults
+const config = require('./config'); //This config.js should contain your basic config overwrites like sentry etc.
+const log = require('connor-base-log'); 
 
 log.silly("You may as well just print out every tick", {counter: counter});
 log.debug("Okay but you still won't be able to read this");
@@ -19,18 +19,23 @@ log.verbose("Eh, this is acceptable in production", {customer_bank_account_no: k
 log.info("A descriptive info which will come up as a breadcrumb on Sentry", {with: extraData});
 log.warn("Hm, did you mean to do that? This will show up in Sentry as a warning.", {you: screwedup});
 log.error("We're going to spam Sentry with this error");
-//Protip: You can set the environment variable LOGGING_LEVEL to change what shows up in your console.
+//Protip: You can set the environment variable LOG_LEVEL to change what shows up in your console.
+
+//config.js
+const config = require('connor-base-config');
+config.load({sentry: {enabled: true, dsn: "https://sentry.makeshift.ninja/"}});
+module.exports = config;
 ```
 
 #### Lazy Template
 ```javascript
-const config = require('connor-base-config')();
+const config = require('connor-base-config');
 config.load({sentry: {enabled: true, dsn: "https://sentry.makeshift.ninja/"}});
-const log = require('./index.js')(config);
+const log = require('connor-base-log');
 ```
 
 ### Changing defaults
 You can change the options by either:
-* Overriding them in config.js and passing it to the log on invocation
+* Overriding them in config.js
 * Requiring connor-base-config and overwriting with .load in-script
 * Setting environment variables, you can see a full list in [the schema](https://github.com/Makeshift/connor-base-config/blob/master/base_schema.json5)
