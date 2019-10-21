@@ -46,7 +46,8 @@
             extra: {
                 doc: "What extra fields from this config should we include with our Sentry error reports?",
                 format: "Array",
-                env: "SENTRY_EXTRA"
+                env: "SENTRY_EXTRA",
+                default: []
             },
             includeConfig: {
                 doc: "Should we include the full application config when sending error reports to Sentry?",
