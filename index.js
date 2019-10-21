@@ -65,10 +65,10 @@ class sentryErrorTransport extends Transport {
     log(info, callback) {
         this.emit('logged', info);
         this.sentry.withScope(scope => {
-            [...(config.get("log.sentry.tags") || []), ...(config.get("log.sentry.baseTags") || [])].forEach(tag => {
+            config.get("log.sentry.tags").forEach(tag => {
                 scope.setTag(tag, config.get(tag));
             });
-            [...(config.get("log.sentry.extra") || []), ...(config.get("log.sentry.baseExtra") || [])].forEach(extra => {
+            config.get("log.sentry.extra").forEach(extra => {
                 scope.setExtra(extra, config.get(extra));
             });
             let appConfig = config.getProperties();
