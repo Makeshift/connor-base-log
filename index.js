@@ -1,21 +1,21 @@
-const config = require('connor-base-config');
+const config = require('connor-base-config').addToSchema(require("./log_spec.json5"));
 
 const {createLogger, format, transports} = require('winston');
 const {combine, json, timestamp, printf, splat, colorize} = format;
 const tty = require('tty');
 const {SPLAT, LEVEL, MESSAGE} = require('triple-beam');
 let highlight = a => a;
-if (config.get("environment") === "develop" && config.get("log.colours")) highlight = require('cli-highlight').highlight;
+if (config.get("environment") === "develop" && config.get("log.colors")) highlight = require('cli-highlight').highlight;
 const Transport = require('winston-transport');
 const stackTrace = require('stack-trace');
 const Sentry = require('@sentry/node');
-if (config.get("sentry.enabled")) {
-    console.log("Connecting to " + config.get("sentry.dsn"));
+if (config.get("log.sentry.enabled")) {
+    console.log("Connecting to " + config.get("log.sentry.dsn"));
     Sentry.init({
-        dsn: config.get("sentry.dsn"),
+        dsn: config.get("log.sentry.dsn"),
         httpProxy: config.get("proxy.enabled") ? config.get("proxy.address") : null,
         release: config.get("metadata.release"),
-        debug: config.get("sentry.debug"),
+        debug: config.get("log.sentry.debug"),
         environment: config.get("environment.level"),
         attachStacktrace: true, //This sometimes doesn't capture stacktraces, so we have another process that captures them for every message
         captureUnhandledRejections: false //We do it ourselves while adding a ton more data
@@ -65,10 +65,10 @@ class sentryErrorTransport extends Transport {
     log(info, callback) {
         this.emit('logged', info);
         this.sentry.withScope(scope => {
-            [...(config.get("sentry.tags") || []), ...(config.get("sentry.baseTags") || [])].forEach(tag => {
+            [...(config.get("log.sentry.tags") || []), ...(config.get("log.sentry.baseTags") || [])].forEach(tag => {
                 scope.setTag(tag, config.get(tag));
             });
-            [...(config.get("sentry.extra") || []), ...(config.get("sentry.baseExtra") || [])].forEach(extra => {
+            [...(config.get("log.sentry.extra") || []), ...(config.get("log.sentry.baseExtra") || [])].forEach(extra => {
                 scope.setExtra(extra, config.get(extra));
             });
             let appConfig = config.getProperties();
@@ -126,7 +126,7 @@ class sentryBreadcrumbs extends Transport {
 
 function logger() {
     let ts = [];
-    if (Sentry && config.get("sentry.enabled")) {
+    if (Sentry && config.get("log.sentry.enabled")) {
         ts.push(new sentryErrorTransport({
                 format: combine(timestamp(), splat(), json()),
                 timestamp: true,
@@ -147,8 +147,7 @@ function logger() {
         showLevel: true,
         format: formatForTTY(),
         level: config.get("log.level"),
-        stderrLevels: ["error"],
-        consoleWarnLevels: ["warn"]
+        stderrLevels: ["error"]
     }));
     return createLogger({
         transports: ts

@@ -1,0 +1,80 @@
+{
+    log: {
+        level: {
+            doc: "What logging level should we be?",
+            format: [
+                "error",
+                "warn",
+                "info",
+                "verbose",
+                "debug",
+                "silly"
+            ],
+            default: "info",
+            env: "LOG_LEVEL"
+        },
+        colors: {
+            doc: "Should we have colours when logging to console?",
+            format: "Boolean",
+            default: false,
+            env: "LOG_COLOURS"
+        },
+        sentry: {
+            enabled: {
+                doc: "Should Sentry be enabled?",
+                format: "Boolean",
+                default: false,
+                env: "SENTRY_ENABLED"
+            },
+            dsn: {
+                doc: "What is the DSN we should send Sentry error reports to?",
+                format: "url",
+                default: "https://sentry.makeshift.ninja",
+                env: "SENTRY_DSN"
+            },
+            baseTags: {
+                doc: "What tags from this config should we include with our Sentry error reports?",
+                format: "Array",
+                default: [
+                    "metadata.package",
+                    "proxy.enabled",
+                    "logging.level",
+                    "environment.region"
+                ]
+            },
+            tags: {
+                doc: "What tags from this config should we include with our Sentry error reports?",
+                format: "Array",
+                default: [],
+                env: "SENTRY_TAGS"
+            },
+            baseExtra: {
+                doc: "What extra fields from this config should we include with our Sentry error reports?",
+                format: "Array",
+                default: [
+                    ""
+                ]
+            },
+            extra: {
+                doc: "What extra fields from this config should we include with our Sentry error reports?",
+                format: "Array",
+                default: [
+                    ""
+                ],
+                env: "SENTRY_EXTRA"
+            },
+            includeConfig: {
+                doc: "Should we include the full application config when sending error reports to Sentry?",
+                format: "Boolean",
+                default: true,
+                env: "SENTRY_INCLUDECONFIG"
+            },
+            debug: {
+                doc: "Should Sentry be in debug mode?",
+                format: "Boolean",
+                default: false,
+                env: "SENTRY_DEBUG"
+            }
+        }
+    }
+}
