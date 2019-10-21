@@ -65,7 +65,6 @@ class sentryErrorTransport extends Transport {
     log(info, callback) {
         this.emit('logged', info);
         this.sentry.withScope(scope => {
-            console.log(config.get("log.sentry.tags"));
             config.get("log.sentry.tags").forEach(tag => {
                 scope.setTag(tag, config.get(tag));
             });
