@@ -38,7 +38,7 @@
                 default: [
                     "metadata.package",
                     "proxy.enabled",
-                    "logging.level",
+                    "log.level",
                     "environment.region"
                 ]
             },
