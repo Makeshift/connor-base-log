@@ -1,6 +1,6 @@
 {
   "name": "connor-base-log",
-  "version": "2.1.0",
+  "version": "2.0.8",
   "description": "Base logging library used in a lot of custom projects",
   "main": "index.js",
   "scripts": {
