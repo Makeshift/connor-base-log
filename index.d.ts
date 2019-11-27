@@ -7,8 +7,8 @@ import * as NodeJSStream from "stream";
 import * as logform from 'logform';
 import * as Transport from 'winston-transport';
 
-import * as Config from './lib/winston/config/index';
-import * as Transports from './lib/winston/transports/index';
+import * as Config from './config';
+import * as Transports from './transports';
 
 declare namespace log {
   // Hoisted namespaces from other modules

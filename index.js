@@ -1,5 +1,4 @@
-const config = require('connor-base-config').addToSchema(require("./log_spec.json5"));
-
+const config = require('connor-base-config').addToSchema(require('./log_spec.json5'))
 const {createLogger, format, transports} = require('winston');
 const {combine, json, timestamp, printf, splat, colorize} = format;
 const tty = require('tty');
