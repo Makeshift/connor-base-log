@@ -37,7 +37,6 @@
                 format: "Array",
                 default: [
                     "metadata.package",
-                    "proxy.enabled",
                     "log.level",
                     "environment.region"
                 ],

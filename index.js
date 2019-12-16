@@ -4,15 +4,15 @@ const {combine, json, timestamp, printf, splat, colorize} = format;
 const tty = require('tty');
 const {SPLAT, LEVEL, MESSAGE} = require('triple-beam');
 let highlight = a => a;
-if (config.get("environment") === "develop" && config.get("log.colors")) highlight = require('cli-highlight').highlight;
+if (config.get("environment") === "development" && config.get("log.colors")) highlight = require('cli-highlight').highlight;
 const Transport = require('winston-transport');
 const stackTrace = require('stack-trace');
 const Sentry = require('@sentry/node');
 if (config.get("log.sentry.enabled")) {
-    console.log("Connecting to " + config.get("log.sentry.dsn"));
+    console.log("connor-base-log: Connecting to " + config.get("log.sentry.dsn"));
     Sentry.init({
         dsn: config.get("log.sentry.dsn"),
-        httpProxy: config.get("proxy.enabled") ? config.get("proxy.address") : null,
+        httpProxy: config.get("environment.proxy.enabled") ? config.get("proxy.address") : null,
         release: config.get("metadata.release"),
         debug: config.get("log.sentry.debug"),
         environment: config.get("environment.level"),
@@ -113,7 +113,7 @@ class sentryBreadcrumbs extends Transport {
     log(info, callback) {
         this.emit('logged', info);
         this.sentry.addBreadcrumb({
-            category: config.get("job.name"),
+            category: config.get("metadata.package"),
             message: JSON.parse(info[MESSAGE]).message,
             level: info[LEVEL] === "warn" ? "warning" : info[LEVEL]
         });
