@@ -14,7 +14,7 @@ if (config.get("log.sentry.enabled")) {
     console.log("connor-base-log: Connecting to " + config.get("log.sentry.dsn"));
     Sentry.init({
         dsn: config.get("log.sentry.dsn"),
-        httpProxy: config.get("environment.proxy.enabled") ? config.get("proxy.address") : null,
+        httpProxy: config.get("environment.proxy.enabled") ? config.get("environment.proxy.address") : null,
         release: config.get("metadata.release"),
         debug: config.get("log.sentry.debug"),
         environment: config.get("environment.level"),
