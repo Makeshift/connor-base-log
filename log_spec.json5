@@ -13,6 +13,12 @@
             default: "info",
             env: "LOG_LEVEL"
         },
+        trace_limit: {
+            doc: "How deep should we trace errors?",
+            format: "int",
+            default: 100,
+            env: "LOG_TRACE_LIMIT"
+        },
         colors: {
             doc: "Should we have colours when logging to console?",
             format: "Boolean",
