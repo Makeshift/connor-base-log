@@ -1,4 +1,4 @@
-const config = require('connor-base-config').addToSchema(require('./log_spec.json5'))
+const config = require('connor-base-config').addToSchema(require('./log_spec.json5'));
 const {createLogger, format, transports} = require('winston');
 const {combine, json, timestamp, printf, splat, colorize} = format;
 const tty = require('tty');
@@ -34,7 +34,7 @@ function formatForTTY() {
 // we make sure to actually log the error, wait for the report to hit Sentry, then exit. Node will start exiting on unhandled
 // rejections soon anyway, so we may as well start doing it now
 process.on('unhandledRejection', (err) => {
-    console.log(err)
+    console.log(err);
     exportLogger.error("Unhandled promise rejection", {trace: err});
     const client = Sentry.getCurrentHub().getClient();
     if (client) {
